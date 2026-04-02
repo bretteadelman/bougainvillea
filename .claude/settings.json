@@ -1,0 +1,19 @@
+{
+  "skills": {
+    "path": "../.agents/skills"
+  },
+  "project": {
+    "name": "Bougainvillea",
+    "formerly": "Cratedigger",
+    "description": "Binaural audio wellness platform for med spas and integrative clinics",
+    "audience": ["consumers", "med-spa-operators", "clinic-operators"],
+    "brand": {
+      "voice": "intelligent, sensory, science-backed but accessible",
+      "colors": {
+        "light": "#f5f2ec",
+        "dark": "#1a2318",
+        "mid": "#3d5c3a"
+      }
+    }
+  }
+}
