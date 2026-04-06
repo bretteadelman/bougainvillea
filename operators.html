@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bougainvillea — For Practice Owners</title>
-  <meta name="description" content="Less than a consumable. Zero staff overhead. Clients who come back — and bring others." />
+  <meta name="description" content="Less than a consumable. Zero staff overhead. Clients who come back and bring others." />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -13,10 +13,10 @@
   <nav class="nav" aria-label="Main navigation">
     <a href="index.html" class="nav__logo">Bougainvillea</a>
     <div class="nav__links">
-      <a href="index.html" class="nav__tab">For You</a>
+      <a href="index.html" class="nav__tab">For Users</a>
       <a href="operators.html" class="nav__tab active">For Practice Owners</a>
     </div>
-    <a href="#operator-cta" class="nav__cta">Try Now</a>
+    <button class="nav__cta" onclick="openModal('modal-operator')">Try Now</button>
   </nav>
 
   <main class="page">
@@ -33,49 +33,37 @@
       </div>
       <div class="hero__overlay" aria-hidden="true"></div>
       <div class="hero__content">
-        <span class="hero__eyebrow">For Med Spa &amp; Clinic Practice Owners</span>
+        <span class="hero__eyebrow">For Practice Owners</span>
         <h1 class="hero__headline">
-          Your room is<br>
-          already doing<br>
-          <em>the heavy lifting.</em>
+          Turn your med spa into a<br>
+          <em>sanctuary.</em>
         </h1>
         <p class="hero__sub">
-          Less than a consumable. Zero staff overhead. Clients who come back — and bring others.
+          A mindful audio experience that transforms your treatment room, deepens client loyalty, and grows revenue. No added chair time, no added complexity.
         </p>
-        <a href="#operator-cta" class="btn mt-32">Try Now →</a>
+        <button class="btn mt-32" onclick="openModal('modal-operator')">Get Started Today →</button>
       </div>
     </section>
 
-    <!-- ── 02 · Market Moment ─────────────────────── -->
+    <!-- ── 02 · Holistic Wellness ───────────────────── -->
     <section class="section" id="market">
       <div class="inner">
-        <span class="label">Why Now</span>
-        <h2>
-          $32 billion.<br>
-          Most of it still<br>
-          <em>independently owned.</em>
-        </h2>
-        <p class="body mt-24">
-          PE has made 15+ platform plays. 90% of practice owners are still independent. The winners won't out-machine them. They'll out-experience them.
-        </p>
-        <div class="stats">
-          <div class="stats__item">
-            <div class="stats__number">$32B</div>
-            <div class="stats__label">US MedSpa market by 2027</div>
-          </div>
-          <div class="stats__item">
-            <div class="stats__number">14.7%</div>
-            <div class="stats__label">Annual growth rate</div>
-          </div>
-          <div class="stats__item">
-            <div class="stats__number">9,400+</div>
-            <div class="stats__label">US locations in 2023</div>
-          </div>
-          <div class="stats__item">
-            <div class="stats__number">90%</div>
-            <div class="stats__label">Still independently owned</div>
+        <span class="label">What Your Clients Want</span>
+        <div class="stat-hero">
+          <span class="stat-hero__number">85%</span>
+          <div>
+            <span class="stat-hero__label">of spa-goers view their visit as self-care — and nearly two-thirds name stress relief as a key reason they come</span>
+            <p class="stat-hero__source">ISPA 2025 Consumer Study</p>
           </div>
         </div>
+        <h2>
+          They're not just here<br>
+          <em>for the treatment.</em>
+        </h2>
+        <p class="body mt-24">
+          Today's med spa client is seeking comprehensive wellness, not just a procedure. They want to leave feeling calmer, lighter, and more like themselves. Bougainvillea adds a mindful audio layer that meets that expectation without adding work to your staff.
+        </p>
+        <button class="btn mt-32" onclick="openModal('modal-operator')">Meet That Expectation →</button>
       </div>
     </section>
 
@@ -88,42 +76,46 @@
       />
     </div>
 
-    <!-- ── 03 · Who's in the Chair ───────────────── -->
+    <!-- ── 03 · Differentiation & Retention ─────────── -->
     <section class="section" id="customer">
       <div class="inner">
-        <span class="label">Your Customer</span>
+        <span class="label">In the Chair and Beyond</span>
         <h2>
-          High-spend.<br>
-          High-frequency.<br>
-          <em>High-expectation.</em>
+          The experience that<br>
+          keeps them<br>
+          <em>coming back.</em>
         </h2>
         <p class="body mt-24">
-          $536 average spend per visit. Clients who return, add treatments, and refer friends. They arrive knowing exactly what they want — the treatment is table stakes. The room experience is the last real differentiator you have.
+          An unforgettable session is your most powerful retention tool. Bougainvillea makes every visit feel like a true sanctuary moment. Not just effective, but deeply restorative.
         </p>
+        <p class="body mt-16">
+          And when clients continue their audio journey at home between appointments, your practice stays top of mind. That connection drives rescheduling.
+        </p>
+        <button class="btn mt-32" onclick="openModal('modal-operator')">Build That Loyalty →</button>
       </div>
     </section>
 
-    <!-- ── 04 · Five Pressure Points (Dark) ──────── -->
+    <!-- ── 04 · How it Works (Dark) ─────────────────── -->
     <section class="section--dark" id="market-watch">
       <div class="inner">
-        <span class="label">What the Market Is Watching</span>
+        <span class="label">How it Works</span>
         <h2>
-          The challenges<br>
-          every practice owner<br>
-          <em>is navigating.</em>
+          Deliver a better<br>
+          experience and<br>
+          <em>more revenue.</em>
         </h2>
         <p class="body mt-24">
-          Five forces are reshaping the market. Each one is a door Bougainvillea opens for you.
+          Bougainvillea adds a premium experience and a new revenue line, without asking anything extra from your team.
         </p>
 
-        <ol class="pressure-list" aria-label="Five practice owner pressure points">
+        <ol class="pressure-list" aria-label="How Bougainvillea works">
 
           <li class="pressure-item">
             <span class="pressure-item__num">01</span>
             <div>
-              <h3 class="pressure-item__title">Shifting Consumer Trends</h3>
+              <h3 class="pressure-item__title">Just hand them headphones.</h3>
               <p class="pressure-item__body">
-                Trends move fast. Your room's sensory identity is the one thing clients can't research before they arrive — make it unforgettable.
+                That's the entire staff workflow. Bougainvillea is a simple add-on option. It can even be added to your existing audio setup!
               </p>
             </div>
           </li>
@@ -131,9 +123,9 @@
           <li class="pressure-item">
             <span class="pressure-item__num">02</span>
             <div>
-              <h3 class="pressure-item__title">Competitive Landscape</h3>
+              <h3 class="pressure-item__title">Complements nearly any service.</h3>
               <p class="pressure-item__body">
-                9,400+ locations on overlapping menus. How your room feels is one of the last dimensions that's still uncontested.
+                NAD+ drips, facials, filler, float therapy. Bougainvillea works wherever clients recline.
               </p>
             </div>
           </li>
@@ -141,112 +133,146 @@
           <li class="pressure-item">
             <span class="pressure-item__num">03</span>
             <div>
-              <h3 class="pressure-item__title">Demand Seasonality</h3>
+              <h3 class="pressure-item__title">Timed to the treatment.</h3>
               <p class="pressure-item__body">
-                Revenue spikes and dips. Make the session itself the reason to return — not just the results.
+                Each protocol matches the length of the session. It runs exactly as long as the client is in the chair.
               </p>
             </div>
           </li>
 
-          <li class="pressure-item">
+          <li class="pressure-item pressure-item--featured">
             <span class="pressure-item__num">04</span>
             <div>
-              <h3 class="pressure-item__title">Payment Models &amp; Loyalty</h3>
+              <h3 class="pressure-item__title">Reaches clients at home.</h3>
               <p class="pressure-item__body">
-                The best loyalty mechanic isn't a discount — it's an experience they want to repeat.
+                Let clients continue their audio journey between visits. This keeps your practice top of mind and drives rescheduling.
               </p>
-            </div>
-          </li>
-
-          <li class="pressure-item">
-            <span class="pressure-item__num">05</span>
-            <div>
-              <h3 class="pressure-item__title">Patient Experience as a Value Driver</h3>
-              <p class="pressure-item__body">
-                A good room is a business. An unforgettable room is an asset. The margin between them compounds.
+              <p class="integration-list">
+                Easily integrates with Zenoti · AestheticsPro · Vagaro · Phorest · PatientNow · Moxie · Pabau
               </p>
             </div>
           </li>
 
         </ol>
+
+        <button class="btn mt-32" onclick="openModal('modal-operator')">Add It to Your Practice →</button>
+
       </div>
     </section>
 
-    <!-- ── 05 · Operator Case ─────────────────────── -->
-    <section id="case">
-      <div class="two-col">
-        <div class="two-col__text">
-          <span class="label">What You Get</span>
-          <h2>
-            Less than<br>
-            a HydraFacial.<br>
-            <em>Runs every session.</em>
-          </h2>
-          <p class="body mt-24">
-            Deployed in software. Works with any audio setup. Active from day one, across every modality you offer.
-          </p>
-          <p class="body mt-16">
-            No hardware. No staff training. No inventory. No reorder cycle.
-          </p>
-          <p class="body mt-16">
-            For clinics working with Medicare Advantage patients, Bougainvillea also opens supplemental reimbursement pathways.
-          </p>
-        </div>
-        <div class="two-col__image">
-          <img
-            src="https://images.unsplash.com/photo-1681235528217-80fb5b59529a?w=900&q=85&auto=format&fit=crop"
-            alt="Bougainvillea-lined pathway with warm afternoon light"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </section>
-
-    <!-- ── 06 · Operator CTA + Built For ─────────── -->
+    <!-- ── 05 · Getting Started ──────────────────────── -->
     <section class="section--dark" id="operator-cta">
       <div class="inner">
-        <span class="label">Founding Network — Los Angeles</span>
+        <span class="label">Getting Started is Easy</span>
         <h2>
-          Give your room<br>
-          <em>a soul.</em>
+          Up and running<br>
+          <em>by tomorrow.</em>
         </h2>
         <p class="body mt-24">
-          Limited spots for LA-area practice owners. Early partners get preferred pricing and help shape what this becomes.
+          Bougainvillea fits naturally into any practice where clients spend time in the chair. Starting in Los Angeles. Limited founding partner spots available.
         </p>
-        <a href="mailto:hello@bougainvillea.health" class="btn mt-32">Try Now ↗</a>
+        <button class="btn mt-32" onclick="openModal('modal-operator')">Get Started Now</button>
 
-        <nav class="operator-list" style="margin-top:56px; border-top-color:rgba(245,242,236,0.10);" aria-label="Operator types">
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">IV Therapy Centers</span>
-            <span class="operator-row__tier">Tier 1</span>
+        <div class="pill-groups">
+
+          <div class="pill-group">
+            <span class="pill-group__label">Aesthetics &amp; Skin</span>
+            <div class="pills">
+              <span class="pill dark-pill">Med Spas</span>
+              <span class="pill dark-pill">Dermatology Practices</span>
+            </div>
           </div>
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">Float &amp; Sensory Spas</span>
-            <span class="operator-row__tier">Tier 1</span>
+
+          <div class="pill-group">
+            <span class="pill-group__label">Infusion &amp; IV</span>
+            <div class="pills">
+              <span class="pill dark-pill">IV Therapy Centers</span>
+              <span class="pill dark-pill">Infusion &amp; Dialysis Centers</span>
+            </div>
           </div>
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">Integrative &amp; Acupuncture Clinics</span>
-            <span class="operator-row__tier">Tier 2</span>
+
+          <div class="pill-group">
+            <span class="pill-group__label">Recovery &amp; Sensory</span>
+            <div class="pills">
+              <span class="pill dark-pill">Float &amp; Sensory Spas</span>
+              <span class="pill dark-pill">Infrared Sauna Studios</span>
+              <span class="pill dark-pill">Cryotherapy Centers</span>
+            </div>
           </div>
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">Dermatology Practices</span>
-            <span class="operator-row__tier">Tier 2</span>
+
+          <div class="pill-group">
+            <span class="pill-group__label">Holistic &amp; Integrative</span>
+            <div class="pills">
+              <span class="pill dark-pill">Integrative Clinics</span>
+              <span class="pill dark-pill">Acupuncture Studios</span>
+            </div>
           </div>
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">Premium Nail &amp; Beauty</span>
-            <span class="operator-row__tier">Tier 3</span>
-          </div>
-          <div class="operator-row" style="border-bottom-color:rgba(245,242,236,0.10);">
-            <span class="operator-row__name" style="color:var(--cream);">Infusion &amp; Dialysis Centers</span>
-            <span class="operator-row__tier">Clinical</span>
-          </div>
-        </nav>
+
+        </div>
       </div>
     </section>
 
   </main>
 
   <!-- ── Footer ────────────────────────────────────── -->
+  <!-- ── Modal: Get Started (Operator) ──────────────── -->
+  <div id="modal-operator" class="modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-operator-title">
+    <div class="modal__panel" tabindex="-1">
+      <button class="modal__close" aria-label="Close">✕</button>
+      <span class="modal__eyebrow">For Practice Owners</span>
+      <h2 class="modal__title" id="modal-operator-title">Let's get you<br><em>started.</em></h2>
+      <p class="modal__subtitle">Tell us about your practice. We'll be in touch within one business day.</p>
+
+      <form class="modal__form" action="https://formspree.io/f/xwvwabrq" method="POST">
+        <div class="modal__field">
+          <label class="modal__label" for="o-name">Your Name</label>
+          <input class="modal__input" id="o-name" name="name" type="text" placeholder="Jane Smith" required autocomplete="name" />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="o-email">Work Email</label>
+          <input class="modal__input" id="o-email" name="email" type="email" placeholder="jane@yourpractice.com" required autocomplete="email" />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="o-practice">Practice Name</label>
+          <input class="modal__input" id="o-practice" name="practice_name" type="text" placeholder="Glow Med Spa" required />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="o-type">Practice Type</label>
+          <select class="modal__select" id="o-type" name="practice_type" required>
+            <option value="" disabled selected>Select your practice type</option>
+            <option>Med Spa</option>
+            <option>IV Therapy Center</option>
+            <option>Float &amp; Sensory Spa</option>
+            <option>Integrative Clinic</option>
+            <option>Dermatology Practice</option>
+            <option>Infrared Sauna Studio</option>
+            <option>Cryotherapy Center</option>
+            <option>Acupuncture Studio</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="o-city">City <span style="opacity:0.45; font-size:8px;">(optional)</span></label>
+          <input class="modal__input" id="o-city" name="city" type="text" placeholder="Los Angeles" autocomplete="address-level2" />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="o-phone">Phone <span style="opacity:0.45; font-size:8px;">(optional)</span></label>
+          <input class="modal__input" id="o-phone" name="phone" type="tel" placeholder="+1 (310) 000-0000" autocomplete="tel" />
+        </div>
+        <button class="modal__submit" type="submit" data-label="Request a Demo">Request a Demo</button>
+        <p class="modal__privacy">No commitment. We'll reach out within 24 hours.</p>
+      </form>
+
+      <div class="modal__success" hidden>
+        <span class="modal__success-icon">✦</span>
+        <h3>We'll be in touch.</h3>
+        <p>Expect a message from us within one business day.</p>
+      </div>
+      <p class="modal__error" hidden>Something went wrong. Please try again or email us at hello@bougainvillea.health.</p>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
   <footer class="footer">
     <div class="footer__inner">
       <nav class="footer__links" aria-label="Footer navigation">

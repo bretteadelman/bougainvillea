@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "bougainvillea",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", ".", "--listen", "3456", "--no-clipboard"],
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/tmp/bv-serve.js"],
       "port": 3456
     }
   ]

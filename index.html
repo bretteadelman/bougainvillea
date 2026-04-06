@@ -13,10 +13,10 @@
   <nav class="nav" aria-label="Main navigation">
     <a href="index.html" class="nav__logo">Bougainvillea</a>
     <div class="nav__links">
-      <a href="index.html" class="nav__tab active">For You</a>
+      <a href="index.html" class="nav__tab active">For Users</a>
       <a href="operators.html" class="nav__tab">For Practice Owners</a>
     </div>
-    <a href="mailto:hello@bougainvillea.health" class="nav__cta">Try Now</a>
+    <button class="nav__cta" onclick="openModal('modal-user')">Try Now</button>
   </nav>
 
   <main class="page">
@@ -42,7 +42,8 @@
         <p class="hero__sub">
           Bougainvillea is a mindful audio experience to quiet negative thoughts, generate calm, and open you up to connection — while your peptide drip runs and from the comfort of your home.
         </p>
-        <a href="#experience" class="btn mt-32">See How It Works →</a>
+        <button class="btn mt-32" onclick="openModal('modal-user')">Try Now →</button>
+        <a href="#experience" class="hero__scroll-link">See how it works ↓</a>
       </div>
     </section>
 
@@ -58,7 +59,8 @@
         <p class="body mt-24">
           Put on the Bougainvillea headphones and select your preferred sonic landscape. Each audio protocol matches the length of your infusion. Not spa music. Powerful audio experiences that guide you to a quieter mind.
         </p>
-        <div class="phases mt-32">
+        <span class="phases__label mt-32">A Bougainvillea Audio Journey</span>
+        <div class="phases">
           <span class="phases__item">Pre-infusion readiness</span>
           <span class="phases__arrow" aria-hidden="true">→</span>
           <span class="phases__item">Descent</span>
@@ -67,8 +69,11 @@
           <span class="phases__arrow" aria-hidden="true">→</span>
           <span class="phases__item">Incorporate Binaural Beats</span>
           <span class="phases__arrow" aria-hidden="true">→</span>
-          <span class="phases__item">Flow</span>
+          <span class="phases__item">Trigger Chills</span>
+          <span class="phases__arrow" aria-hidden="true">→</span>
+          <span class="phases__item">Re-emerge</span>
         </div>
+        <button class="btn mt-32" onclick="openModal('modal-user')">Find It Near You →</button>
       </div>
     </section>
 
@@ -94,7 +99,7 @@
         </div>
 
         <!-- Step Nav -->
-        <nav class="sci-nav" role="tablist" aria-label="Science topics">
+        <nav class="sci-nav "role="tablist" aria-label="Science topics">
           <button class="sci-nav__tab sci-nav__tab--active" role="tab"
                   aria-selected="true" aria-controls="sci-slide-0" data-slide="0">
             <span class="sci-nav__num">01</span>
@@ -118,7 +123,7 @@
         </nav>
 
         <!-- Slides -->
-        <div class="sci-slides" aria-live="polite">
+        <div class="sci-slides "aria-live="polite">
 
           <div class="sci-slide sci-slide--active" id="sci-slide-0" role="tabpanel">
             <span class="sci-slide__topic">Brainwave Entrainment</span>
@@ -190,6 +195,10 @@
           <button class="sci-ctrl sci-ctrl--next" aria-label="Next">→</button>
         </div>
 
+        <div class="sci-cta">
+          <button class="btn" onclick="openModal('modal-user')">I Want This →</button>
+        </div>
+
       </div><!-- /sci-inner -->
     </section>
 
@@ -243,23 +252,28 @@
           />
         </div>
         <div class="two-col__text">
-          <span class="label">Available At</span>
+          <span class="label">Where to Listen</span>
           <h2>
             Listen in during<br>
             your next<br>
             <em>appointment.</em>
           </h2>
           <p class="body mt-24">
-            From NAD+ infusions to vitamin IVs and HydraFacials, take full advantage of your session to heal your body and mind.
+            Add Bougainvillea to enhance your mental health while you improve your physical health.
           </p>
           <div class="pills">
-            <span class="pill">NAD+ Infusions</span>
-            <span class="pill">IV Vitamin Drips</span>
+            <span class="pill">NAD+ Infusion</span>
+            <span class="pill">IV Vitamin Drip</span>
+            <span class="pill">HydraFacial</span>
+            <span class="pill">Botox &amp; Filler</span>
+            <span class="pill">Microneedling</span>
+            <span class="pill">LED Therapy</span>
             <span class="pill">Float Therapy</span>
-            <span class="pill">Integrative Clinics</span>
-            <span class="pill">Med Spas</span>
+            <span class="pill">Infrared Sauna</span>
+            <span class="pill">Cryotherapy</span>
+            <span class="pill">Acupuncture</span>
           </div>
-          <a href="mailto:hello@bougainvillea.health" class="btn">Find a Provider →</a>
+          <button class="btn" onclick="openModal('modal-user')">Find a Provider →</button>
         </div>
       </div>
     </section>
@@ -273,7 +287,7 @@
           <em>Happier minds.</em>
         </h2>
         <p class="body mt-24">
-          If you run an infusion clinic, med spa, or wellness practice — Bougainvillea is built for your treatment room. There's a whole tab for you.
+          If you run an infusion clinic, med spa, or wellness practice, Bougainvillea is built for your treatment room. There's a whole tab for you.
         </p>
         <a href="operators.html" class="btn btn--solid">For Practice Owners →</a>
       </div>
@@ -282,6 +296,41 @@
   </main>
 
   <!-- ── Footer ────────────────────────────────────── -->
+  <!-- ── Modal: Try Now (Consumer) ──────────────────── -->
+  <div id="modal-user" class="modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-user-title">
+    <div class="modal__panel" tabindex="-1">
+      <button class="modal__close" aria-label="Close">✕</button>
+      <span class="modal__eyebrow">Get Early Access</span>
+      <h2 class="modal__title" id="modal-user-title">Find it near<br><em>you.</em></h2>
+      <p class="modal__subtitle">Tell us where you are. We'll let you know as soon as Bougainvillea is available at a clinic nearby.</p>
+
+      <form class="modal__form" action="https://formspree.io/f/xkopkbqr" method="POST">
+        <div class="modal__field">
+          <label class="modal__label" for="u-name">Name</label>
+          <input class="modal__input" id="u-name" name="name" type="text" placeholder="Your name" required autocomplete="name" />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="u-email">Email</label>
+          <input class="modal__input" id="u-email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="modal__field">
+          <label class="modal__label" for="u-city">City <span style="opacity:0.45; font-size:8px;">(optional)</span></label>
+          <input class="modal__input" id="u-city" name="city" type="text" placeholder="Los Angeles" autocomplete="address-level2" />
+        </div>
+        <button class="modal__submit" type="submit" data-label="Notify Me">Notify Me</button>
+        <p class="modal__privacy">No spam. Just your local launch.</p>
+      </form>
+
+      <div class="modal__success" hidden>
+        <span class="modal__success-icon">✦</span>
+        <h3>You're on the list.</h3>
+        <p>We'll reach out as soon as Bougainvillea is available near you.</p>
+      </div>
+      <p class="modal__error" hidden>Something went wrong. Please try again or email us at hello@bougainvillea.health.</p>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
   <footer class="footer">
     <div class="footer__inner">
       <nav class="footer__links" aria-label="Footer navigation">
