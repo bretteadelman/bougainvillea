@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bougainvillea / Audio Lab — Clinical Protocol Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/meyda/5.6.0/meyda.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{background:#f5f2ec;min-height:100vh;font-family:'DM Mono',monospace;color:#1a2318;-webkit-font-smoothing:antialiased}
+
+/* Progress bar */
+.progress-bar{position:fixed;top:0;left:0;height:2px;background:#c0175c;width:0%;transition:width .3s ease;z-index:100;pointer-events:none}
+
+/* Header */
+.header{display:flex;align-items:baseline;justify-content:space-between;padding:20px 28px 16px;border-bottom:1px solid rgba(26,35,24,.12);position:sticky;top:0;background:rgba(245,242,236,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:10}
+.logo{font-family:'Cormorant Garant',serif;font-style:italic;font-size:20px;color:#1a2318;letter-spacing:-.01em}
+.logo span{color:#6b7f68;font-style:normal;font-family:'DM Mono',monospace;font-size:14px}
+.header-tag{font-size:9px;letter-spacing:.12em;color:#9aac98;text-transform:uppercase}
+
+/* Upload zone */
+.upload-zone{margin:24px 28px;border:1px dashed rgba(26,35,24,.2);padding:40px 24px;text-align:center;background:#edeae4;cursor:pointer;transition:border-color .2s,background .2s}
+.upload-zone:hover{border-color:rgba(26,35,24,.35);background:#e8e4dd}
+.upload-zone.drag-over{border-color:#c0175c;background:#fce8f0}
+.upload-zone.dimmed{opacity:.4;pointer-events:none}
+.upload-icon{width:36px;height:36px;margin:0 auto 12px;opacity:.35}
+.upload-title{font-family:'Cormorant Garant',serif;font-style:italic;font-size:22px;color:#1a2318;margin-bottom:6px}
+.upload-sub{font-size:10px;color:#9aac98;letter-spacing:.06em}
+.upload-btn{display:inline-block;margin-top:16px;padding:8px 20px;border:1px solid #c0175c;font-size:10px;letter-spacing:.1em;color:#c0175c;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.upload-btn:hover{background:#c0175c;color:#f5f2ec}
+#file-input{display:none}
+
+/* Status bar */
+.status-bar{display:none;align-items:center;gap:8px;padding:8px 28px;background:#edeae4;border-bottom:1px solid rgba(26,35,24,.1);font-size:10px;letter-spacing:.06em}
+.status-bar.visible{display:flex}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#3d5c3a;flex-shrink:0}
+.status-dot.pulse{animation:pulse 1.5s infinite}
+.status-dot.error{background:#c0175c;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.status-text{color:#6b7f68}
+.status-file{color:#1a2318;font-weight:400}
+.status-extra{color:#9aac98;margin-left:auto}
+
+/* Error message */
+.error-text{color:#c0175c}
+
+/* Results area */
+.results{padding:0}
+
+/* Section fade-in */
+.section{opacity:0;transform:translateY(4px);transition:opacity .4s ease,transform .4s ease}
+.section.visible{opacity:1;transform:translateY(0)}
+
+/* Score hero */
+.score-section{padding:24px 28px;display:flex;align-items:flex-start;gap:24px;border-bottom:1px solid rgba(26,35,24,.1)}
+.score-left{display:flex;align-items:flex-end;gap:2px}
+.score-num{font-family:'Cormorant Garant',serif;font-size:72px;line-height:1;color:#1a2318;letter-spacing:-.04em;min-width:100px}
+.score-denom{font-family:'Cormorant Garant',serif;font-style:italic;font-size:28px;color:#9aac98;padding-bottom:8px}
+.score-right{flex:1}
+.score-title{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#9aac98;margin-bottom:8px}
+.score-verdict{font-size:12px;color:#6b7f68;line-height:1.6;max-width:400px;margin-bottom:12px}
+.score-badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:9px;padding:3px 8px;letter-spacing:.06em;text-transform:uppercase}
+.b-ok{background:rgba(61,92,58,.09);color:#3d5c3a;border:1px solid rgba(61,92,58,.22)}
+.b-warn{background:rgba(154,112,32,.09);color:#7a5810;border:1px solid rgba(154,112,32,.22)}
+.b-crit{background:rgba(192,23,92,.08);color:#c0175c;border:1px solid rgba(192,23,92,.22)}
+
+/* Chart area */
+.chart-area{padding:16px 28px;border-bottom:1px solid rgba(26,35,24,.1)}
+.chart-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9aac98;margin-bottom:10px}
+.chart-wrap{background:#edeae4;padding:8px;position:relative}
+#loudnessChart{height:80px!important;width:100%!important}
+#stereoChart{height:50px!important;width:100%!important}
+
+/* Metrics grid */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(26,35,24,.1);border-top:1px solid rgba(26,35,24,.1);border-bottom:1px solid rgba(26,35,24,.1)}
+.metric{background:#f5f2ec;padding:14px 16px}
+.metric-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9aac98;margin-bottom:6px}
+.metric-val{font-size:18px;color:#1a2318;letter-spacing:-.02em}
+.metric-val.ok{color:#3d5c3a}
+.metric-val.warn{color:#7a5810}
+.metric-val.bad{color:#c0175c}
+.metric-unit{font-size:11px;color:#9aac98;margin-left:2px}
+
+/* Stereo width map */
+.stereo-section{padding:16px 28px;border-bottom:1px solid rgba(26,35,24,.1)}
+.stereo-grid{display:flex;gap:3px;margin-top:8px}
+.stereo-cell{flex:1;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:500;gap:2px}
+.stereo-cell .min-label{font-size:8px;opacity:.5}
+.phase-warning{font-size:9px;color:#c0175c;margin-top:8px;letter-spacing:.06em}
+
+/* Tuning panel */
+.tuning-section{margin:16px 28px;background:#edeae4;border:1px solid rgba(26,35,24,.12);overflow:hidden}
+.tuning-header{padding:10px 14px;border-bottom:1px solid rgba(26,35,24,.1);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9aac98}
+.tuning-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(26,35,24,.07)}
+.tuning-row:last-child{border-bottom:none}
+.tuning-target{font-size:11px;color:#3d5c3a;min-width:70px;flex-shrink:0}
+.tuning-found{font-size:11px;color:#1a2318;min-width:90px;flex-shrink:0}
+.tuning-delta{font-size:10px;min-width:80px;flex-shrink:0}
+.tuning-bar{flex:1;height:3px;background:rgba(26,35,24,.12);overflow:hidden}
+.tuning-fill{height:100%}
+.delta-ok{color:#3d5c3a}
+.delta-warn{color:#7a5810}
+.delta-bad{color:#c0175c}
+.tuning-status{font-size:9px;letter-spacing:.06em;min-width:80px;text-align:right;flex-shrink:0}
+
+/* Issues */
+.issues-section{padding:16px 28px 24px}
+.issue-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(26,35,24,.07);align-items:flex-start}
+.issue-row:last-child{border-bottom:none}
+.issue-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.d-red{background:#c0175c}
+.d-amber{background:#9a7030}
+.d-green{background:#3d5c3a}
+.issue-title{font-size:11px;color:#1a2318;margin-bottom:3px}
+.issue-sub{font-size:10px;color:#6b7f68;line-height:1.5}
+
+/* Export */
+.export-section{padding:0 28px 32px;display:flex;justify-content:flex-end}
+.export-btn{padding:9px 22px;border:1px solid rgba(26,35,24,.2);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:#1a2318;text-transform:uppercase;cursor:pointer;background:transparent;transition:border-color .2s,background .2s,color .2s}
+.export-btn:hover{border-color:#c0175c;color:#c0175c}
+
+/* Responsive */
+@media(max-width:600px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr)}
+  .score-section{flex-direction:column}
+  .header{flex-direction:column;gap:4px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">bougainvillea <span>/ audio lab</span></div>
+  <div class="header-tag">clinical protocol analyzer</div>
+</div>
+
+<!-- Upload Zone -->
+<div class="upload-zone" id="uploadZone">
+  <svg class="upload-icon" viewBox="0 0 36 36" fill="none">
+    <path d="M18 4v20M10 12l8-8 8 8" stroke="#6b7f68" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M6 28h24" stroke="#6b7f68" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <div class="upload-title">drop your protocol audio</div>
+  <div class="upload-sub">.m4a · .wav · .mp3 · .aiff · max 200mb</div>
+  <div class="upload-btn" id="chooseBtn">choose file</div>
+  <input type="file" id="file-input" accept=".mp3,.wav,.m4a,.aiff,.aif,.flac,audio/mpeg,audio/wav,audio/m4a,audio/aiff,audio/x-aiff,audio/flac">
+</div>
+
+<!-- Status bar -->
+<div class="status-bar" id="statusBar">
+  <div class="status-dot pulse" id="statusDot"></div>
+  <span class="status-text" id="statusText">analyzing —</span>
+  <span class="status-file" id="statusFile"></span>
+  <span class="status-extra" id="statusExtra"></span>
+</div>
+
+<!-- Results -->
+<div class="results" id="results" style="display:none">
+
+  <!-- Score hero -->
+  <div class="score-section section" id="sectionScore">
+    <div class="score-left">
+      <div class="score-num" id="scoreNum">0.0</div>
+      <div class="score-denom">/10</div>
+    </div>
+    <div class="score-right">
+      <div class="score-title">overall clinical score</div>
+      <div class="score-verdict" id="scoreVerdict"></div>
+      <div class="score-badges" id="scoreBadges"></div>
+    </div>
+  </div>
+
+  <!-- Loudness arc -->
+  <div class="chart-area section" id="sectionLoudness">
+    <div class="chart-label">loudness arc — 30s windows (target –30 to –35 dBFS)</div>
+    <div class="chart-wrap">
+      <canvas id="loudnessChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Metrics grid -->
+  <div class="metrics-grid section" id="sectionMetrics">
+    <div class="metric"><div class="metric-label">peak level</div><div class="metric-val" id="mPeak">—</div></div>
+    <div class="metric"><div class="metric-label">crest factor</div><div class="metric-val" id="mCrest">—</div></div>
+    <div class="metric"><div class="metric-label">l/r correlation</div><div class="metric-val" id="mCorr">—</div></div>
+    <div class="metric"><div class="metric-label">mono compatibility</div><div class="metric-val" id="mMono">—</div></div>
+    <div class="metric"><div class="metric-label">duration</div><div class="metric-val" id="mDuration">—</div></div>
+    <div class="metric"><div class="metric-label">stereo body</div><div class="metric-val" id="mStereoBody">—</div></div>
+    <div class="metric"><div class="metric-label">stereo tail</div><div class="metric-val" id="mStereoTail">—</div></div>
+    <div class="metric"><div class="metric-label">dead zones</div><div class="metric-val" id="mDeadZones">—</div></div>
+  </div>
+
+  <!-- Stereo width map -->
+  <div class="stereo-section section" id="sectionStereo">
+    <div class="chart-label">stereo field per minute (side/mid ratio)</div>
+    <div class="stereo-grid" id="stereoGrid"></div>
+    <div class="phase-warning" id="phaseWarning" style="display:none">⚠ phase anomaly detected in one or more minutes</div>
+  </div>
+
+  <!-- Tuning panel -->
+  <div class="tuning-section section" id="sectionTuning">
+    <div class="tuning-header">frequency tuning — 432hz / 528hz targets</div>
+    <div class="tuning-row" id="tuning432">
+      <span class="tuning-target">432 Hz</span>
+      <span class="tuning-found" id="t432found">—</span>
+      <span class="tuning-delta" id="t432delta">—</span>
+      <div class="tuning-bar"><div class="tuning-fill" id="t432bar" style="width:0%"></div></div>
+      <span class="tuning-status" id="t432status">—</span>
+    </div>
+    <div class="tuning-row" id="tuning528">
+      <span class="tuning-target">528 Hz</span>
+      <span class="tuning-found" id="t528found">—</span>
+      <span class="tuning-delta" id="t528delta">—</span>
+      <div class="tuning-bar"><div class="tuning-fill" id="t528bar" style="width:0%"></div></div>
+      <span class="tuning-status" id="t528status">—</span>
+    </div>
+    <div class="tuning-row" id="tuningBin">
+      <span class="tuning-target">binaural</span>
+      <span class="tuning-found" id="tbinfound">—</span>
+      <span class="tuning-delta" id="tbindelta">—</span>
+      <div class="tuning-bar"><div class="tuning-fill" id="tbinbar" style="width:0%"></div></div>
+      <span class="tuning-status" id="tbinstatus">—</span>
+    </div>
+  </div>
+
+  <!-- Issues -->
+  <div class="issues-section section" id="sectionIssues">
+    <div class="chart-label" style="margin-bottom:12px">findings &amp; recommendations</div>
+    <div id="issuesList"></div>
+  </div>
+
+  <!-- Export -->
+  <div class="export-section section" id="sectionExport">
+    <button class="export-btn" id="exportBtn">export report</button>
+  </div>
+
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let analysisResults = null;
+let loudnessChartInst = null;
+let currentFileName = '';
+
+// ─── Upload Handling ──────────────────────────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('file-input');
+const chooseBtn = document.getElementById('chooseBtn');
+
+chooseBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) handleFile(f);
+});
+
+// ─── Status Helpers ───────────────────────────────────────────────────────────
+function showStatus(text, file='', extra='', isError=false) {
+  const bar = document.getElementById('statusBar');
+  const dot = document.getElementById('statusDot');
+  bar.classList.add('visible');
+  dot.className = 'status-dot' + (isError ? ' error' : ' pulse');
+  document.getElementById('statusText').textContent = text;
+  document.getElementById('statusText').className = isError ? 'status-text error-text' : 'status-text';
+  document.getElementById('statusFile').textContent = file;
+  document.getElementById('statusExtra').textContent = extra;
+}
+
+function setProgress(pct) {
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+// ─── Main Handler ─────────────────────────────────────────────────────────────
+async function handleFile(file) {
+  if (file.size > 200 * 1024 * 1024) {
+    showStatus('file too large — max 200mb', file.name, '', true);
+    return;
+  }
+
+  currentFileName = file.name;
+  uploadZone.classList.add('dimmed');
+  document.getElementById('results').style.display = 'none';
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+
+  showStatus('loading —', file.name);
+  setProgress(5);
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    setProgress(15);
+    showStatus('decoding —', file.name);
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let audioBuffer;
+    try {
+      audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    } catch(e) {
+      showStatus('could not decode audio — unsupported format', file.name, '', true);
+      setProgress(0);
+      uploadZone.classList.remove('dimmed');
+      return;
+    }
+    await audioCtx.close();
+
+    setProgress(25);
+    const duration = audioBuffer.duration;
+    const sampleRate = audioBuffer.sampleRate;
+    const numChannels = audioBuffer.numberOfChannels;
+    const mm = String(Math.floor(duration/60)).padStart(2,'0');
+    const ss = String(Math.floor(duration%60)).padStart(2,'0');
+
+    showStatus('analyzing —', file.name, `${mm}:${ss} · ${(sampleRate/1000).toFixed(1)}kHz · ${numChannels === 1 ? 'mono' : 'stereo'}`);
+
+    // Extract channel data
+    const left = audioBuffer.getChannelData(0);
+    const right = numChannels > 1 ? audioBuffer.getChannelData(1) : audioBuffer.getChannelData(0);
+
+    // Mono mix
+    const mono = new Float32Array(left.length);
+    for (let i = 0; i < left.length; i++) mono[i] = (left[i] + right[i]) * 0.5;
+
+    setProgress(35);
+    await tick();
+
+    // ─── Run Analysis ─────────────────────────────────────────────────────────
+    const results = {};
+
+    // 1. Duration
+    results.duration = duration;
+    results.sampleRate = sampleRate;
+    results.numChannels = numChannels;
+    results.fileName = file.name;
+
+    // 2. Peak dBFS
+    let peak = 0;
+    for (let i = 0; i < mono.length; i++) {
+      const a = Math.abs(mono[i]);
+      if (a > peak) peak = a;
+    }
+    results.peakDB = peak > 0 ? 20 * Math.log10(peak) : -Infinity;
+
+    setProgress(40);
+    await tick();
+
+    // 3. RMS windows (10s)
+    const windowSamples10 = Math.floor(sampleRate * 10);
+    const rmsWindows10 = [];
+    for (let start = 0; start < mono.length; start += windowSamples10) {
+      const end = Math.min(start + windowSamples10, mono.length);
+      let sum = 0;
+      for (let i = start; i < end; i++) sum += mono[i] * mono[i];
+      const rms = Math.sqrt(sum / (end - start));
+      rmsWindows10.push(rms > 0 ? 20 * Math.log10(rms) : -96);
+    }
+    results.rmsWindows10 = rmsWindows10;
+
+    // 4. Overall RMS → crest factor
+    let sumSq = 0;
+    for (let i = 0; i < mono.length; i++) sumSq += mono[i] * mono[i];
+    const overallRms = Math.sqrt(sumSq / mono.length);
+    const overallRmsDB = overallRms > 0 ? 20 * Math.log10(overallRms) : -96;
+    results.crestFactor = results.peakDB - overallRmsDB;
+
+    // 5. Dead zones (10s windows below -50 dBFS)
+    results.deadZones = rmsWindows10.filter(v => v < -50).length;
+
+    // 6. RMS per 30s windows for loudness arc
+    const windowSamples30 = Math.floor(sampleRate * 30);
+    const rmsWindows30 = [];
+    for (let start = 0; start < mono.length; start += windowSamples30) {
+      const end = Math.min(start + windowSamples30, mono.length);
+      let sum = 0;
+      for (let i = start; i < end; i++) sum += mono[i] * mono[i];
+      const rms = Math.sqrt(sum / (end - start));
+      rmsWindows30.push(rms > 0 ? 20 * Math.log10(rms) : -96);
+    }
+    results.rmsWindows30 = rmsWindows30;
+
+    // Level surge detection
+    results.levelSurges = [];
+    for (let i = 1; i < rmsWindows30.length; i++) {
+      const delta = rmsWindows30[i] - rmsWindows30[i-1];
+      if (delta > 5) {
+        const timeSec = i * 30;
+        const m = Math.floor(timeSec / 60);
+        const s = String(timeSec % 60).padStart(2,'0');
+        results.levelSurges.push({ time: `${m}:${s}`, delta: delta.toFixed(1) });
+      }
+    }
+
+    setProgress(50);
+    await tick();
+
+    // 7. Per-minute stereo analysis
+    const samplesPerMin = Math.floor(sampleRate * 60);
+    const numMinutes = Math.ceil(duration / 60);
+    const stereoPerMinute = [];
+    const corrPerMinute = [];
+
+    for (let m = 0; m < numMinutes; m++) {
+      const start = m * samplesPerMin;
+      const end = Math.min(start + samplesPerMin, left.length);
+      const len = end - start;
+
+      let midSumSq = 0, sideSumSq = 0;
+      let lMean = 0, rMean = 0;
+      for (let i = start; i < end; i++) {
+        const mid = (left[i] + right[i]) * 0.5;
+        const side = (left[i] - right[i]) * 0.5;
+        midSumSq += mid * mid;
+        sideSumSq += side * side;
+        lMean += left[i];
+        rMean += right[i];
+      }
+      lMean /= len; rMean /= len;
+
+      const midRms = Math.sqrt(midSumSq / len);
+      const sideRms = Math.sqrt(sideSumSq / len);
+      const ratio = midRms > 0 ? sideRms / midRms : 0;
+      stereoPerMinute.push(ratio);
+
+      // Pearson correlation L/R
+      let lVar = 0, rVar = 0, cov = 0;
+      for (let i = start; i < end; i++) {
+        const ld = left[i] - lMean;
+        const rd = right[i] - rMean;
+        lVar += ld * ld;
+        rVar += rd * rd;
+        cov += ld * rd;
+      }
+      const corr = (lVar > 0 && rVar > 0) ? cov / Math.sqrt(lVar * rVar) : 1;
+      corrPerMinute.push(corr);
+    }
+
+    results.stereoPerMinute = stereoPerMinute;
+    results.corrPerMinute = corrPerMinute;
+
+    // Overall correlation (avg)
+    results.lrCorrelation = corrPerMinute.reduce((a,b)=>a+b,0) / corrPerMinute.length;
+    results.hasNegativeCorr = corrPerMinute.some(c => c < 0);
+    results.negativeCorrMinutes = corrPerMinute.map((c,i)=>c<0?i+1:-1).filter(v=>v>0);
+
+    // Stereo body (minutes 1-6) and tail (minutes 7-10)
+    const bodyMins = stereoPerMinute.slice(0, Math.min(6, stereoPerMinute.length));
+    const tailStart = Math.min(6, stereoPerMinute.length);
+    const tailMins = stereoPerMinute.slice(tailStart);
+    results.stereoBody = bodyMins.length > 0 ? bodyMins.reduce((a,b)=>a+b,0)/bodyMins.length : 0;
+    results.stereoTail = tailMins.length > 0 ? tailMins.reduce((a,b)=>a+b,0)/tailMins.length : results.stereoBody;
+
+    setProgress(60);
+    await tick();
+
+    // 8. Mono compatibility
+    let stereoSumSq = 0, midOnlySumSq = 0;
+    for (let i = 0; i < left.length; i++) {
+      const stereoSamp = (left[i] + right[i]) * 0.5;
+      const midSamp = (left[i] + right[i]) * 0.5;
+      stereoSumSq += stereoSamp * stereoSamp;
+      midOnlySumSq += midSamp * midSamp;
+    }
+    const stereoRmsDB = stereoSumSq > 0 ? 10 * Math.log10(stereoSumSq / left.length) : -96;
+    const midRmsDB = midOnlySumSq > 0 ? 10 * Math.log10(midOnlySumSq / left.length) : -96;
+    results.monoDiff = Math.abs(stereoRmsDB - midRmsDB);
+
+    // 9. Spectral analysis (bass drift)
+    setProgress(65);
+    await tick();
+    results.spectral = await analyzeSpectral(mono, sampleRate, duration);
+
+    setProgress(75);
+    await tick();
+
+    // 10. High-res FFT for frequency tuning
+    results.tuning = await analyzeFrequencyTuning(mono, sampleRate);
+
+    setProgress(85);
+    await tick();
+
+    // Body RMS (minutes 3-7)
+    const bodyRmsStart = Math.floor(sampleRate * 120);
+    const bodyRmsEnd = Math.min(Math.floor(sampleRate * 420), mono.length);
+    if (bodyRmsEnd > bodyRmsStart) {
+      let bSum = 0;
+      for (let i = bodyRmsStart; i < bodyRmsEnd; i++) bSum += mono[i] * mono[i];
+      const bRms = Math.sqrt(bSum / (bodyRmsEnd - bodyRmsStart));
+      results.bodyRmsDB = bRms > 0 ? 20 * Math.log10(bRms) : -96;
+    } else {
+      results.bodyRmsDB = overallRmsDB;
+    }
+
+    // 11. Score
+    results.score = calculateScore(results);
+    results.issues = generateIssues(results);
+
+    setProgress(95);
+    await tick();
+
+    // ─── Render ───────────────────────────────────────────────────────────────
+    analysisResults = results;
+    renderResults(results);
+    setProgress(100);
+    setTimeout(() => setProgress(0), 800);
+
+    document.getElementById('statusDot').classList.remove('pulse');
+    showStatus('analysis complete —', file.name, `${mm}:${ss} · ${(sampleRate/1000).toFixed(1)}kHz · ${numChannels === 1 ? 'mono' : 'stereo'}`);
+
+  } catch(err) {
+    console.error(err);
+    showStatus('analysis failed — ' + err.message, file.name, '', true);
+    setProgress(0);
+    uploadZone.classList.remove('dimmed');
+  }
+}
+
+function tick() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
+// ─── Spectral Analysis ────────────────────────────────────────────────────────
+async function analyzeSpectral(mono, sampleRate, duration) {
+  const fftSize = 4096;
+  const halfFFT = fftSize / 2;
+
+  function sectionFFT(startSec, endSec) {
+    const startSamp = Math.floor(startSec * sampleRate);
+    const endSamp = Math.min(Math.floor(endSec * sampleRate), mono.length);
+    if (endSamp <= startSamp) return null;
+
+    // Average multiple FFT frames
+    const hop = Math.floor(fftSize / 2);
+    const avgMag = new Float32Array(halfFFT);
+    let frameCount = 0;
+
+    for (let pos = startSamp; pos + fftSize <= endSamp; pos += hop) {
+      const windowed = new Float32Array(fftSize);
+      for (let i = 0; i < fftSize; i++) {
+        // Hann window
+        const w = 0.5 * (1 - Math.cos(2 * Math.PI * i / (fftSize - 1)));
+        windowed[i] = mono[pos + i] * w;
+      }
+      const mag = simpleFFTMag(windowed);
+      for (let i = 0; i < halfFFT; i++) avgMag[i] += mag[i];
+      frameCount++;
+    }
+    if (frameCount === 0) return null;
+    for (let i = 0; i < halfFFT; i++) avgMag[i] /= frameCount;
+    return avgMag;
+  }
+
+  const introMag = sectionFFT(0, Math.min(90, duration));
+  const tailMag = sectionFFT(Math.max(0, duration - 120), duration);
+
+  if (!introMag || !tailMag) return { bassDrift: 0 };
+
+  // Bass band: 20-250Hz
+  const bassStart = Math.floor(20 * fftSize / sampleRate);
+  const bassEnd = Math.floor(250 * fftSize / sampleRate);
+
+  let introBassPow = 0, tailBassPow = 0;
+  for (let i = bassStart; i < Math.min(bassEnd, halfFFT); i++) {
+    introBassPow += introMag[i] * introMag[i];
+    tailBassPow += tailMag[i] * tailMag[i];
+  }
+  const introBassdB = introBassPow > 0 ? 10 * Math.log10(introBassPow) : -96;
+  const tailBassdB = tailBassPow > 0 ? 10 * Math.log10(tailBassPow) : -96;
+  const bassDrift = tailBassdB - introBassdB;
+
+  // Mid band: 500-2000Hz
+  const midStart = Math.floor(500 * fftSize / sampleRate);
+  const midEnd = Math.floor(2000 * fftSize / sampleRate);
+  let introMidPow = 0, tailMidPow = 0;
+  for (let i = midStart; i < Math.min(midEnd, halfFFT); i++) {
+    introMidPow += introMag[i] * introMag[i];
+    tailMidPow += tailMag[i] * tailMag[i];
+  }
+  const introMiddB = introMidPow > 0 ? 10 * Math.log10(introMidPow) : -96;
+  const tailMiddB = tailMidPow > 0 ? 10 * Math.log10(tailMidPow) : -96;
+
+  return {
+    bassDrift,
+    introBassdB,
+    tailBassdB,
+    introMiddB,
+    tailMiddB,
+    midDrift: tailMiddB - introMiddB
+  };
+}
+
+// Simple DFT-based magnitude (for small buffers this is acceptable)
+// For larger buffers we use Cooley-Tukey FFT
+function simpleFFTMag(buffer) {
+  const N = buffer.length;
+  const half = N / 2;
+  const mag = new Float32Array(half);
+
+  // Iterative Cooley-Tukey FFT
+  const re = new Float32Array(N);
+  const im = new Float32Array(N);
+
+  // Bit-reversal permutation
+  let j = 0;
+  for (let i = 1; i < N; i++) {
+    let bit = N >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      [re[i], re[j]] = [buffer[j], buffer[i]];
+      // swap
+      const tmp = buffer[i];
+    }
+    re[i] = buffer[i];
+  }
+  for (let i = 0; i < N; i++) re[i] = buffer[i];
+
+  // Bit-reversal
+  j = 0;
+  for (let i = 1; i < N; i++) {
+    let bit = N >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      let tmp = re[i]; re[i] = re[j]; re[j] = tmp;
+    }
+  }
+
+  // FFT butterfly
+  for (let len = 2; len <= N; len <<= 1) {
+    const ang = -2 * Math.PI / len;
+    const wRe = Math.cos(ang);
+    const wIm = Math.sin(ang);
+    for (let i = 0; i < N; i += len) {
+      let curRe = 1, curIm = 0;
+      for (let k = 0; k < len / 2; k++) {
+        const uRe = re[i+k], uIm = im[i+k];
+        const vRe = re[i+k+len/2]*curRe - im[i+k+len/2]*curIm;
+        const vIm = re[i+k+len/2]*curIm + im[i+k+len/2]*curRe;
+        re[i+k] = uRe+vRe; im[i+k] = uIm+vIm;
+        re[i+k+len/2] = uRe-vRe; im[i+k+len/2] = uIm-vIm;
+        const nextRe = curRe*wRe - curIm*wIm;
+        curIm = curRe*wIm + curIm*wRe;
+        curRe = nextRe;
+      }
+    }
+  }
+
+  for (let i = 0; i < half; i++) {
+    mag[i] = Math.sqrt(re[i]*re[i] + im[i]*im[i]);
+  }
+  return mag;
+}
+
+// ─── Frequency Tuning Analysis ────────────────────────────────────────────────
+async function analyzeFrequencyTuning(mono, sampleRate) {
+  const fftSize = 65536;
+  const halfFFT = fftSize / 2;
+  const freqRes = sampleRate / fftSize;
+
+  // Use a representative slice of the audio (first 30s or whole file if shorter)
+  const sliceLen = Math.min(fftSize, mono.length);
+  const windowed = new Float32Array(fftSize);
+  for (let i = 0; i < sliceLen; i++) {
+    const w = 0.5 * (1 - Math.cos(2 * Math.PI * i / (fftSize - 1)));
+    windowed[i] = mono[i] * w;
+  }
+
+  const mag = simpleFFTMag(windowed);
+
+  // Find local maxima
+  function findPeaksInRange(lo, hi, topN = 5) {
+    const loIdx = Math.floor(lo / freqRes);
+    const hiIdx = Math.ceil(hi / freqRes);
+    const peaks = [];
+    for (let i = loIdx + 1; i < Math.min(hiIdx - 1, halfFFT - 1); i++) {
+      if (mag[i] > mag[i-1] && mag[i] > mag[i+1] && mag[i] > 0) {
+        // Parabolic interpolation for sub-bin accuracy
+        const alpha = mag[i-1], beta = mag[i], gamma = mag[i+1];
+        const p = 0.5 * (alpha - gamma) / (alpha - 2*beta + gamma);
+        const refinedBin = i + p;
+        peaks.push({ freq: refinedBin * freqRes, mag: beta });
+      }
+    }
+    peaks.sort((a,b) => b.mag - a.mag);
+    return peaks.slice(0, topN);
+  }
+
+  // 432 Hz target (425–440 Hz)
+  const peaks432 = findPeaksInRange(425, 440, 3);
+  let result432 = null;
+  if (peaks432.length > 0) {
+    const p = peaks432[0];
+    const offset = p.freq - 432;
+    const absOff = Math.abs(offset);
+    result432 = {
+      freq: p.freq,
+      offset,
+      accuracy: Math.max(0, 100 - absOff * 15),
+      status: absOff < 1 ? 'LOCKED' : absOff < 3 ? (offset > 0 ? 'SHARP' : 'FLAT') : (offset > 0 ? 'SHARP' : 'FLAT')
+    };
+  }
+
+  // 528 Hz target (515–545 Hz)
+  const peaks528 = findPeaksInRange(515, 545, 3);
+  let result528 = null;
+  if (peaks528.length > 0) {
+    const p = peaks528[0];
+    const offset = p.freq - 528;
+    const absOff = Math.abs(offset);
+    // Check spread (are there multiple close peaks?)
+    const spread = peaks528.length > 1 ? Math.abs(peaks528[0].freq - peaks528[1].freq) : 0;
+    result528 = {
+      freq: p.freq,
+      offset,
+      spread,
+      accuracy: Math.max(0, 100 - absOff * 10),
+      status: absOff < 1 ? 'LOCKED' : absOff < 5 ? (offset > 0 ? 'SHARP' : 'FLAT') : 'DRIFTING'
+    };
+  }
+
+  // Binaural beat: find tonal peaks in 80–1100Hz, look for pairs with 1–40Hz difference
+  const tonalPeaks = findPeaksInRange(80, 1100, 20);
+  let binauralResult = null;
+  let bestBeatScore = 0;
+
+  for (let i = 0; i < tonalPeaks.length; i++) {
+    for (let j = i + 1; j < tonalPeaks.length; j++) {
+      const beat = Math.abs(tonalPeaks[i].freq - tonalPeaks[j].freq);
+      if (beat >= 1 && beat <= 40) {
+        const score = (tonalPeaks[i].mag + tonalPeaks[j].mag) * (1 / (1 + Math.abs(beat - 6)));
+        if (score > bestBeatScore) {
+          bestBeatScore = score;
+          const band = beat < 4 ? 'delta' : beat < 8 ? 'theta' : beat < 13 ? 'alpha' : 'beta';
+          const isAligned = beat >= 4 && beat <= 8;
+          binauralResult = {
+            freq1: tonalPeaks[i].freq,
+            freq2: tonalPeaks[j].freq,
+            beat,
+            band,
+            status: isAligned ? 'ALIGNED' : 'MISALIGNED',
+            accuracy: isAligned ? 85 : Math.max(10, 50 - Math.abs(beat - 6) * 5)
+          };
+        }
+      }
+    }
+  }
+
+  return { hz432: result432, hz528: result528, binaural: binauralResult };
+}
+
+// ─── Score Calculation ────────────────────────────────────────────────────────
+function calculateScore(r) {
+  let score = 10;
+
+  if (r.hasNegativeCorr) score -= 2.0;
+  if (r.stereoTail < 0.25) score -= 1.5;
+
+  const surgeDeduct = Math.min(r.levelSurges.length * 0.5, 1.5);
+  score -= surgeDeduct;
+
+  if (r.spectral && Math.abs(r.spectral.bassDrift) > 15) score -= 1.0;
+  if (r.tuning.binaural && r.tuning.binaural.band === 'beta') score -= 0.5;
+  if (r.tuning.hz528 && Math.abs(r.tuning.hz528.offset) > 5) score -= 0.5;
+  if (r.bodyRmsDB < -42) score -= 0.3;
+  if (r.deadZones > 3) score -= 2.0; // >30s dead
+
+  if (r.monoDiff < 1.0) score += 0.2;
+  if (r.crestFactor > 25) score += 0.2;
+
+  return Math.max(0, Math.min(10, Math.round(score * 10) / 10));
+}
+
+function generateIssues(r) {
+  const issues = [];
+
+  // RED: phase inversion
+  if (r.hasNegativeCorr) {
+    const mins = r.negativeCorrMinutes.map(m => `min ${m}`).join(', ');
+    issues.push({
+      level: 'red',
+      title: `phase inversion detected — negative L/R correlation at ${mins}`,
+      sub: 'Check stereo widener or plugin phase settings on affected channels. Flip phase on one channel if intentional mid/side processing.'
+    });
+  }
+
+  // RED: stereo collapse in tail
+  if (r.stereoTail < 0.25) {
+    issues.push({
+      level: 'red',
+      title: `stereo collapse in tail — ${r.stereoTail.toFixed(2)} side/mid ratio`,
+      sub: 'Mono source entering in final minutes. Apply Haas delay 12–18ms on affected channel or sustain stereo bed through tail.'
+    });
+  } else if (r.stereoTail < 0.5) {
+    issues.push({
+      level: 'amber',
+      title: `stereo thinning in tail — ${r.stereoTail.toFixed(2)} side/mid ratio (body: ${r.stereoBody.toFixed(2)})`,
+      sub: 'Stereo width narrows significantly in final minutes. Sustain a stereo pad or reverb tail layer through the outro, or introduce subtle ping-pong delay on a textural element to maintain side-channel energy.'
+    });
+  }
+
+  // RED: bass spectral drift
+  if (r.spectral && r.spectral.bassDrift < -12) {
+    issues.push({
+      level: 'red',
+      title: `spectral thinning — bass ${r.spectral.bassDrift.toFixed(0)}dB intro→tail`,
+      sub: 'Foundational bass/drone layer dropping out. Sustain low-frequency bed elements through the full duration.'
+    });
+  }
+
+  // AMBER: level surges
+  r.levelSurges.forEach(s => {
+    issues.push({
+      level: 'amber',
+      title: `level surge +${s.delta}dB at ${s.time}`,
+      sub: 'Replace step automation with 90–120s linear fade-in per layer entry to maintain smooth loudness arc.'
+    });
+  });
+
+  // AMBER: body level low
+  if (r.bodyRmsDB < -42) {
+    issues.push({
+      level: 'amber',
+      title: `body level below presence threshold — ${r.bodyRmsDB.toFixed(1)}dBFS RMS`,
+      sub: 'Mid-section (minutes 3–7) too quiet. Raise foundational layer gain or reduce overall dynamic range.'
+    });
+  }
+
+  // AMBER: binaural in beta
+  if (r.tuning.binaural && r.tuning.binaural.band === 'beta') {
+    issues.push({
+      level: 'amber',
+      title: `binaural carrier in beta (${r.tuning.binaural.beat.toFixed(1)}Hz) — target is theta (4–8Hz)`,
+      sub: `Adjust carrier from ${r.tuning.binaural.freq2.toFixed(0)}Hz → ${(r.tuning.binaural.freq1 + 6).toFixed(0)}Hz. Keep lower anchor at ${r.tuning.binaural.freq1.toFixed(0)}Hz.`
+    });
+  }
+
+  // AMBER: 528Hz drifting
+  if (r.tuning.hz528 && Math.abs(r.tuning.hz528.offset) > 5) {
+    issues.push({
+      level: 'amber',
+      title: `528Hz drifting — detected ${r.tuning.hz528.freq.toFixed(2)}Hz (offset ${r.tuning.hz528.offset > 0 ? '+' : ''}${r.tuning.hz528.offset.toFixed(2)}Hz)`,
+      sub: 'Frequency content smeared around 528Hz target. Re-tune source oscillator or apply pitch correction.'
+    });
+  }
+
+  // AMBER/RED: dead zones found
+  if (r.deadZones > 0) {
+    const totalSec = r.deadZones * 10;
+    const level = r.deadZones > 3 ? 'red' : 'amber';
+    issues.push({
+      level,
+      title: `${r.deadZones} dead zone${r.deadZones > 1 ? 's' : ''} detected — ${totalSec}s of silence below –50dBFS`,
+      sub: 'Check for export glitches, corrupted segments, or unintended gaps between layer transitions. Re-render from DAW session and verify continuous signal.'
+    });
+  }
+
+  // GREEN: no dead zones
+  if (r.deadZones === 0) {
+    issues.push({
+      level: 'green',
+      title: 'no signal dropouts detected — continuous audio throughout',
+      sub: 'All 10s analysis windows above –50dBFS floor. Consistent signal presence confirmed.'
+    });
+  }
+
+  // GREEN: headroom
+  if (r.peakDB < -6) {
+    issues.push({
+      level: 'green',
+      title: `headroom preserved — peak at ${r.peakDB.toFixed(2)}dBFS`,
+      sub: 'Sufficient headroom for mastering chain. No risk of inter-sample peaks in downstream processing.'
+    });
+  }
+
+  // GREEN: mono compatible
+  if (r.monoDiff < 0.5) {
+    issues.push({
+      level: 'green',
+      title: `mono compatible — ${r.monoDiff.toFixed(2)}dB difference in mono sum`,
+      sub: 'Audio translates cleanly to mono. Safe for single-speaker playback (phone speakers, earbuds in mono mode).'
+    });
+  }
+
+  return issues;
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderResults(r) {
+  document.getElementById('results').style.display = 'block';
+  const sections = ['sectionScore','sectionLoudness','sectionMetrics','sectionStereo','sectionTuning','sectionIssues','sectionExport'];
+
+  // Render each section then animate in with stagger
+  renderScore(r);
+  renderLoudnessChart(r);
+  renderMetrics(r);
+  renderStereoMap(r);
+  renderTuning(r);
+  renderIssues(r);
+
+  sections.forEach((id, i) => {
+    setTimeout(() => {
+      document.getElementById(id).classList.add('visible');
+    }, i * 80);
+  });
+}
+
+function renderScore(r) {
+  // Animate count-up
+  const target = r.score;
+  const start = Date.now();
+  const dur = 600;
+  const el = document.getElementById('scoreNum');
+
+  function frame() {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / dur, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = (target * eased).toFixed(1);
+    el.textContent = current;
+    if (progress < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Verdict
+  let verdict;
+  if (r.score >= 9) verdict = 'Pilot-ready. All clinical parameters within specification.';
+  else if (r.score >= 8) verdict = 'Near deployment-ready. Minor refinements recommended before use.';
+  else if (r.score >= 7) verdict = 'Strong foundation. One or two structural issues to resolve before pilot deployment.';
+  else if (r.score >= 6) verdict = 'Promising material held back by correctable production issues.';
+  else verdict = 'Significant issues detected. Review all findings before deployment.';
+  document.getElementById('scoreVerdict').textContent = verdict;
+
+  // Badges
+  const badges = [];
+  if (!r.hasNegativeCorr) badges.push({cls:'b-ok', text:'phase ok'});
+  else badges.push({cls:'b-crit', text:'phase issue'});
+
+  if (r.monoDiff < 1) badges.push({cls:'b-ok', text:'mono safe'});
+  if (r.deadZones === 0) badges.push({cls:'b-ok', text:'no dropouts'});
+  else badges.push({cls:'b-warn', text:`${r.deadZones} dead zone${r.deadZones>1?'s':''}`});
+
+  if (r.levelSurges.length > 0) badges.push({cls:'b-warn', text:`${r.levelSurges.length} level surge${r.levelSurges.length>1?'s':''}`});
+
+  if (r.stereoTail < 0.25) badges.push({cls:'b-crit', text:'stereo collapse tail'});
+  else if (r.stereoTail < 0.5) badges.push({cls:'b-warn', text:'stereo thin tail'});
+
+  if (r.tuning.binaural) {
+    if (r.tuning.binaural.band === 'theta') badges.push({cls:'b-ok', text:'theta aligned'});
+    else badges.push({cls:'b-warn', text:`binaural ${r.tuning.binaural.band}`});
+  }
+
+  const badgeEl = document.getElementById('scoreBadges');
+  badgeEl.innerHTML = badges.map(b => `<span class="badge ${b.cls}">${b.text}</span>`).join('');
+}
+
+function renderLoudnessChart(r) {
+  if (loudnessChartInst) { loudnessChartInst.destroy(); loudnessChartInst = null; }
+
+  const data = r.rmsWindows30;
+  const labels = data.map((_, i) => {
+    const sec = i * 30;
+    return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+  });
+
+  const bgColors = data.map((v, i) => {
+    const isJump = i > 0 && (v - data[i-1]) > 5;
+    const inTarget = v >= -35 && v <= -30;
+    return isJump ? '#c0175c' : inTarget ? '#3d5c3a' : '#b8c8b6';
+  });
+
+  const ctx = document.getElementById('loudnessChart').getContext('2d');
+  loudnessChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: data.map(v => v),
+        backgroundColor: bgColors,
+        borderWidth: 0,
+        barPercentage: 0.9,
+        categoryPercentage: 1.0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.raw.toFixed(1)} dBFS`
+          },
+          backgroundColor: '#f5f2ec',
+          titleColor: '#9aac98',
+          bodyColor: '#1a2318',
+          borderColor: 'rgba(26,35,24,.15)',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(26,35,24,.08)', drawBorder: false },
+          ticks: {
+            color: '#9aac98',
+            font: { family: 'DM Mono', size: 9 },
+            maxTicksLimit: 5
+          }
+        },
+        y: {
+          min: -52,
+          max: -28,
+          grid: { color: 'rgba(26,35,24,.08)', drawBorder: false },
+          ticks: {
+            color: '#9aac98',
+            font: { family: 'DM Mono', size: 9 },
+            callback: v => `${v}`
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        annotation: {
+          annotations: {
+            refLine: {
+              type: 'line',
+              yMin: -32,
+              yMax: -32,
+              borderColor: '#3d5c3a',
+              borderWidth: 1,
+              borderDash: [4, 4]
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderMetrics(r) {
+  function setMetric(id, value, unit, cls) {
+    const el = document.getElementById(id);
+    el.innerHTML = value + (unit ? `<span class="metric-unit">${unit}</span>` : '');
+    el.className = 'metric-val' + (cls ? ' ' + cls : '');
+  }
+
+  const peakCls = r.peakDB < -3 ? 'ok' : r.peakDB < 0 ? 'warn' : 'bad';
+  setMetric('mPeak', r.peakDB.toFixed(2), 'dBFS', peakCls);
+
+  const crestCls = r.crestFactor > 20 ? 'ok' : r.crestFactor > 10 ? 'warn' : 'bad';
+  setMetric('mCrest', r.crestFactor.toFixed(1), 'dB', crestCls);
+
+  const corrCls = !r.hasNegativeCorr ? 'ok' : 'bad';
+  setMetric('mCorr', r.lrCorrelation.toFixed(2), 'avg', corrCls);
+
+  const monoCls = r.monoDiff < 1 ? 'ok' : r.monoDiff < 3 ? 'warn' : 'bad';
+  setMetric('mMono', r.monoDiff.toFixed(1), 'dB', monoCls);
+
+  const mm = String(Math.floor(r.duration/60)).padStart(2,'0');
+  const ss = String(Math.floor(r.duration%60)).padStart(2,'0');
+  setMetric('mDuration', `${mm}:${ss}`, '', '');
+
+  const bodyCls = r.stereoBody > 0.5 ? 'ok' : r.stereoBody > 0.25 ? 'warn' : 'bad';
+  setMetric('mStereoBody', r.stereoBody.toFixed(2), 's/m', bodyCls);
+
+  const tailCls = r.stereoTail > 0.5 ? 'ok' : r.stereoTail > 0.25 ? 'warn' : 'bad';
+  setMetric('mStereoTail', r.stereoTail.toFixed(2), 's/m', tailCls);
+
+  const dzCls = r.deadZones === 0 ? 'ok' : r.deadZones < 3 ? 'warn' : 'bad';
+  setMetric('mDeadZones', r.deadZones === 0 ? 'none' : r.deadZones, '', dzCls);
+}
+
+function renderStereoMap(r) {
+  const grid = document.getElementById('stereoGrid');
+  grid.innerHTML = '';
+  let hasPhaseIssue = false;
+
+  r.stereoPerMinute.forEach((val, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'stereo-cell';
+
+    if (val > 1.0) hasPhaseIssue = true;
+
+    const bg = val > 0.7 ? 'rgba(61,92,58,.1)' : val > 0.4 ? 'rgba(154,112,32,.1)' : 'rgba(192,23,92,.08)';
+    const color = val > 0.7 ? '#3d5c3a' : val > 0.4 ? '#7a5810' : '#c0175c';
+    cell.style.background = bg;
+    cell.style.color = color;
+    cell.title = `Min ${i+1}: ${val.toFixed(3)} side/mid`;
+
+    const valSpan = document.createElement('span');
+    valSpan.textContent = Math.round(val * 100);
+
+    const minSpan = document.createElement('span');
+    minSpan.className = 'min-label';
+    minSpan.textContent = `m${i+1}`;
+
+    cell.appendChild(valSpan);
+    cell.appendChild(minSpan);
+    grid.appendChild(cell);
+  });
+
+  const warning = document.getElementById('phaseWarning');
+  warning.style.display = hasPhaseIssue ? 'block' : 'none';
+}
+
+function renderTuning(r) {
+  const t = r.tuning;
+
+  // 432 Hz
+  if (t.hz432) {
+    document.getElementById('t432found').textContent = t.hz432.freq.toFixed(2) + ' Hz';
+    const off = t.hz432.offset;
+    const offStr = (off > 0 ? '+' : '') + off.toFixed(2) + ' Hz';
+    const offEl = document.getElementById('t432delta');
+    offEl.textContent = offStr;
+    offEl.className = 'tuning-delta ' + (Math.abs(off) < 1 ? 'delta-ok' : Math.abs(off) < 3 ? 'delta-warn' : 'delta-bad');
+    document.getElementById('t432bar').style.width = t.hz432.accuracy + '%';
+    document.getElementById('t432bar').style.background = Math.abs(off) < 1 ? '#3d5c3a' : Math.abs(off) < 3 ? '#9a7030' : '#c0175c';
+    const statusEl = document.getElementById('t432status');
+    statusEl.textContent = t.hz432.status;
+    statusEl.style.color = t.hz432.status === 'LOCKED' ? '#3d5c3a' : t.hz432.status.includes('SHARP') || t.hz432.status.includes('FLAT') ? '#7a5810' : '#c0175c';
+  } else {
+    document.getElementById('t432found').textContent = 'not detected';
+    document.getElementById('t432delta').textContent = '—';
+    document.getElementById('t432status').textContent = 'ABSENT';
+    document.getElementById('t432status').style.color = '#9aac98';
+  }
+
+  // 528 Hz
+  if (t.hz528) {
+    const spreadStr = t.hz528.spread > 2 ? ` ±${t.hz528.spread.toFixed(0)}` : '';
+    document.getElementById('t528found').textContent = t.hz528.freq.toFixed(2) + ' Hz';
+    const off = t.hz528.offset;
+    const offStr = (off > 0 ? '+' : '') + off.toFixed(2) + ' Hz' + spreadStr;
+    const offEl = document.getElementById('t528delta');
+    offEl.textContent = offStr;
+    offEl.className = 'tuning-delta ' + (Math.abs(off) < 1 ? 'delta-ok' : Math.abs(off) < 5 ? 'delta-warn' : 'delta-bad');
+    document.getElementById('t528bar').style.width = t.hz528.accuracy + '%';
+    document.getElementById('t528bar').style.background = Math.abs(off) < 1 ? '#3d5c3a' : Math.abs(off) < 5 ? '#9a7030' : '#c0175c';
+    const statusEl = document.getElementById('t528status');
+    statusEl.textContent = t.hz528.status;
+    statusEl.style.color = t.hz528.status === 'LOCKED' ? '#3d5c3a' : t.hz528.status === 'DRIFTING' ? '#7a5810' : '#c0175c';
+  } else {
+    document.getElementById('t528found').textContent = 'not detected';
+    document.getElementById('t528delta').textContent = '—';
+    document.getElementById('t528status').textContent = 'ABSENT';
+    document.getElementById('t528status').style.color = '#9aac98';
+  }
+
+  // Binaural
+  if (t.binaural) {
+    document.getElementById('tbinfound').textContent = t.binaural.beat.toFixed(1) + ' Hz beat';
+    const bandStr = `${t.binaural.band} (${t.binaural.beat.toFixed(1)}Hz)`;
+    const deltaEl = document.getElementById('tbindelta');
+    deltaEl.textContent = bandStr;
+    deltaEl.className = 'tuning-delta ' + (t.binaural.band === 'theta' ? 'delta-ok' : t.binaural.band === 'alpha' ? 'delta-warn' : 'delta-bad');
+    document.getElementById('tbinbar').style.width = t.binaural.accuracy + '%';
+    document.getElementById('tbinbar').style.background = t.binaural.status === 'ALIGNED' ? '#3d5c3a' : t.binaural.beat > 13 ? '#c0175c' : '#9a7030';
+    const statusEl = document.getElementById('tbinstatus');
+    statusEl.textContent = t.binaural.status;
+    statusEl.style.color = t.binaural.status === 'ALIGNED' ? '#3d5c3a' : '#c0175c';
+  } else {
+    document.getElementById('tbinfound').textContent = 'no beat detected';
+    document.getElementById('tbindelta').textContent = '—';
+    document.getElementById('tbinstatus').textContent = 'ABSENT';
+    document.getElementById('tbinstatus').style.color = '#9aac98';
+  }
+}
+
+function renderIssues(r) {
+  const list = document.getElementById('issuesList');
+  list.innerHTML = '';
+
+  if (r.issues.length === 0) {
+    list.innerHTML = '<div style="font-size:11px;color:#9aac98;padding:8px 0">no issues detected</div>';
+    return;
+  }
+
+  // Sort: red first, amber, green last
+  const sorted = [...r.issues].sort((a,b) => {
+    const order = {red:0,amber:1,green:2};
+    return order[a.level] - order[b.level];
+  });
+
+  sorted.forEach(issue => {
+    const row = document.createElement('div');
+    row.className = 'issue-row';
+
+    const dot = document.createElement('div');
+    dot.className = `issue-dot d-${issue.level === 'amber' ? 'amber' : issue.level === 'green' ? 'green' : 'red'}`;
+
+    const content = document.createElement('div');
+    content.innerHTML = `<div class="issue-title">${issue.title}</div><div class="issue-sub">${issue.sub}</div>`;
+
+    row.appendChild(dot);
+    row.appendChild(content);
+    list.appendChild(row);
+  });
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────────
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!analysisResults) return;
+  const r = analysisResults;
+  const now = new Date().toISOString();
+  const mm = String(Math.floor(r.duration/60)).padStart(2,'0');
+  const ss = String(Math.floor(r.duration%60)).padStart(2,'0');
+
+  let txt = `BOUGAINVILLEA AUDIO LAB — CLINICAL PROTOCOL REPORT\n`;
+  txt += `${'─'.repeat(52)}\n`;
+  txt += `File:        ${r.fileName}\n`;
+  txt += `Analyzed:    ${now}\n`;
+  txt += `Duration:    ${mm}:${ss}\n`;
+  txt += `Sample rate: ${r.sampleRate} Hz\n`;
+  txt += `Channels:    ${r.numChannels}\n\n`;
+  txt += `OVERALL SCORE: ${r.score}/10\n\n`;
+  txt += `METRICS\n${'─'.repeat(28)}\n`;
+  txt += `Peak level:         ${r.peakDB.toFixed(2)} dBFS\n`;
+  txt += `Crest factor:       ${r.crestFactor.toFixed(1)} dB\n`;
+  txt += `L/R correlation:    ${r.lrCorrelation.toFixed(2)} avg\n`;
+  txt += `Mono compatibility: ${r.monoDiff.toFixed(2)} dB\n`;
+  txt += `Stereo body:        ${r.stereoBody.toFixed(2)} s/m\n`;
+  txt += `Stereo tail:        ${r.stereoTail.toFixed(2)} s/m\n`;
+  txt += `Dead zones:         ${r.deadZones === 0 ? 'none' : r.deadZones}\n\n`;
+
+  const t = r.tuning;
+  txt += `FREQUENCY TUNING\n${'─'.repeat(28)}\n`;
+  txt += `432 Hz: ${t.hz432 ? `${t.hz432.freq.toFixed(2)} Hz (offset ${t.hz432.offset > 0 ? '+' : ''}${t.hz432.offset.toFixed(2)} Hz) — ${t.hz432.status}` : 'not detected'}\n`;
+  txt += `528 Hz: ${t.hz528 ? `${t.hz528.freq.toFixed(2)} Hz (offset ${t.hz528.offset > 0 ? '+' : ''}${t.hz528.offset.toFixed(2)} Hz) — ${t.hz528.status}` : 'not detected'}\n`;
+  txt += `Binaural: ${t.binaural ? `${t.binaural.beat.toFixed(1)} Hz beat (${t.binaural.band}) — ${t.binaural.status}` : 'not detected'}\n\n`;
+
+  txt += `FINDINGS\n${'─'.repeat(28)}\n`;
+  r.issues.forEach(issue => {
+    const marker = issue.level === 'red' ? '[!]' : issue.level === 'amber' ? '[~]' : '[✓]';
+    txt += `${marker} ${issue.title}\n    → ${issue.sub}\n\n`;
+  });
+
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `bougainvillea-report-${r.fileName.replace(/\.[^.]+$/, '')}-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
