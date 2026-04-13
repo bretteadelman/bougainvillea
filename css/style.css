@@ -753,6 +753,21 @@ h3 { font-size: clamp(22px, 5vw, 36px); }
 }
 
 /* ── Pressure Points ──────────────────────────────── */
+.how-it-works__image {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 420px;
+}
+
+.how-it-works__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+}
+
 .pressure-list {
   margin-top: 48px;
   display: flex;
