@@ -10,13 +10,27 @@
 <body>
 
   <!-- ── Floating Nav ──────────────────────────────── -->
-  <nav class="nav" aria-label="Main navigation">
-    <a href="index.html" class="nav__logo">Bougainvillea</a>
-    <div class="nav__links">
-      <a href="index.html" class="nav__tab active">For Users</a>
-      <a href="operators.html" class="nav__tab">For Practice Owners</a>
+  <nav class="nav" id="main-nav" aria-label="Main navigation">
+    <div class="nav__row">
+      <a href="index.html" class="nav__logo">Bougainvillea</a>
+      <div class="nav__links">
+        <a href="index.html" class="nav__tab active">For Users</a>
+        <a href="operators.html" class="nav__tab">For Practice Owners</a>
+      </div>
+      <button class="nav__cta" id="demo-toggle" onclick="toggleDemo()">Try Now</button>
     </div>
-    <button class="nav__cta" onclick="openModal('modal-user')">Try Now</button>
+    <div class="nav__player" id="nav-player">
+      <audio id="demo-audio" src="demo-tracks/bou-jt-10min-VOv2-NOTFINAL.m4a" preload="none"></audio>
+      <button class="nav__play-btn" id="demo-play-btn" onclick="toggleAudio()" aria-label="Play">▶</button>
+      <div class="nav__player-meta">
+        <span class="nav__player-track">Joshua Tree | 10 Minute Demo</span>
+        <div class="nav__player-progress" id="demo-progress" role="slider" aria-label="Seek">
+          <div class="nav__player-fill" id="demo-fill"></div>
+        </div>
+      </div>
+      <span class="nav__player-time" id="demo-time">0:00</span>
+      <button class="nav__player-close" onclick="closeDemo()" aria-label="Close player">✕</button>
+    </div>
   </nav>
 
   <main class="page">

@@ -81,4 +81,124 @@
   window.openModal  = openModal;
   window.closeModal = closeModal;
 
+  // ── Demo Player ─────────────────────────────────────
+  var demoAudio   = null;
+  var demoPlaying = false;
+  var demoSeeking = false;
+
+  function initDemoAudio() {
+    demoAudio = document.getElementById('demo-audio');
+    if (!demoAudio) return;
+
+    demoAudio.addEventListener('timeupdate', function () {
+      if (demoSeeking || !demoAudio.duration) return;
+      updateDemoProgress(demoAudio.currentTime / demoAudio.duration);
+    });
+
+    demoAudio.addEventListener('ended', function () { setDemoPlaying(false); });
+
+    // Wire drag-to-seek on progress bar
+    var bar = document.getElementById('demo-progress');
+    if (!bar) return;
+
+    function clientXFromEvent(e) {
+      return e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function pctFromEvent(e) {
+      var rect = bar.getBoundingClientRect();
+      return Math.max(0, Math.min(1, (clientXFromEvent(e) - rect.left) / rect.width));
+    }
+
+    function applySeek(pct) {
+      updateDemoProgress(pct);
+      if (demoAudio.duration) demoAudio.currentTime = pct * demoAudio.duration;
+    }
+
+    // Mouse
+    bar.addEventListener('mousedown', function (e) {
+      demoSeeking = true;
+      bar.classList.add('seeking');
+      applySeek(pctFromEvent(e));
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!demoSeeking) return;
+      applySeek(pctFromEvent(e));
+    });
+    document.addEventListener('mouseup', function () {
+      if (!demoSeeking) return;
+      demoSeeking = false;
+      bar.classList.remove('seeking');
+    });
+
+    // Touch
+    bar.addEventListener('touchstart', function (e) {
+      demoSeeking = true;
+      bar.classList.add('seeking');
+      applySeek(pctFromEvent(e));
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (!demoSeeking) return;
+      applySeek(pctFromEvent(e));
+    }, { passive: true });
+    document.addEventListener('touchend', function () {
+      demoSeeking = false;
+      bar.classList.remove('seeking');
+    });
+  }
+
+  function updateDemoProgress(pct) {
+    var fill   = document.getElementById('demo-fill');
+    var timeEl = document.getElementById('demo-time');
+    if (fill)   fill.style.width = (pct * 100) + '%';
+    if (timeEl && demoAudio && demoAudio.duration)
+      timeEl.textContent = formatDemoTime(pct * demoAudio.duration);
+  }
+
+  function formatDemoTime(secs) {
+    var m = Math.floor(secs / 60);
+    var s = Math.floor(secs % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function setDemoPlaying(playing) {
+    demoPlaying = playing;
+    var btn = document.getElementById('demo-play-btn');
+    if (btn) btn.textContent = playing ? '⏸' : '▶';
+  }
+
+  function toggleDemo() {
+    var nav = document.getElementById('main-nav');
+    if (!nav) return;
+    if (nav.classList.contains('nav--open')) {
+      closeDemo();
+    } else {
+      if (!demoAudio) initDemoAudio();
+      nav.classList.add('nav--open');
+      demoAudio.play();
+      setDemoPlaying(true);
+    }
+  }
+
+  function closeDemo() {
+    var nav = document.getElementById('main-nav');
+    if (nav) nav.classList.remove('nav--open');
+    if (demoAudio) { demoAudio.pause(); setDemoPlaying(false); }
+  }
+
+  function toggleAudio() {
+    if (!demoAudio) return;
+    if (demoPlaying) {
+      demoAudio.pause();
+      setDemoPlaying(false);
+    } else {
+      demoAudio.play();
+      setDemoPlaying(true);
+    }
+  }
+
+  window.toggleDemo  = toggleDemo;
+  window.closeDemo   = closeDemo;
+  window.toggleAudio = toggleAudio;
+
 })();
