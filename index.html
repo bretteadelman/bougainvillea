@@ -89,8 +89,17 @@
       </div>
     </section>
 
-    <!-- ── 02b · Bougainvillea image break ───────── -->
-    <div class="img-block" aria-hidden="true" style="aspect-ratio:16/7; max-height:440px;">
+    <!-- ── 02b · IV session image (mobile only, swapped to position 2) ── -->
+    <div class="img-block mobile-iv-break" aria-hidden="true" style="aspect-ratio:16/9; max-height:480px;">
+      <img
+        src="images/consumer-iv-session.png"
+        alt="Woman relaxing with headphones during an IV infusion session"
+        loading="lazy"
+      />
+    </div>
+
+    <!-- ── 02c · Bougainvillea image break (desktop only) ───────── -->
+    <div class="img-block mobile-flowers-hide" aria-hidden="true" style="aspect-ratio:16/7; max-height:440px;">
       <img
         src="images/break-consumer.jpg"
         alt="Bougainvillea blooms meeting a lush green hedge"
@@ -252,6 +261,15 @@
       next.addEventListener('click', function () { goTo(cur + 1); });
     })();
     </script>
+
+    <!-- ── 03b · Flowers image (mobile only, above locations) ───────── -->
+    <div class="img-block mobile-flowers-show" aria-hidden="true" style="aspect-ratio:16/7; max-height:440px;">
+      <img
+        src="images/break-consumer.jpg"
+        alt="Bougainvillea blooms meeting a lush green hedge"
+        loading="lazy"
+      />
+    </div>
 
     <!-- ── 04 · Where to Find It ─────────────────── -->
     <section id="locations">

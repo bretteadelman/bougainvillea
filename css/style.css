@@ -750,6 +750,9 @@ h3 { font-size: clamp(22px, 5vw, 36px); }
 }
 
 /* ── Image Block ──────────────────────────────────── */
+.mobile-iv-break { display: none; }
+.mobile-flowers-show { display: none; }
+
 .img-block {
   width: 100%;
   aspect-ratio: 3/2;
@@ -1197,6 +1200,13 @@ h3 { font-size: clamp(22px, 5vw, 36px); }
 
   /* Two-col */
   .two-col__text { padding: 40px 20px; }
+  .two-col__image { display: none; }
+
+  /* Mobile-only IV session image swap */
+  .mobile-iv-break { display: block; }
+  /* Flowers image: hide at original position, show above locations */
+  .mobile-flowers-hide { display: none; }
+  .mobile-flowers-show { display: block; }
 
   /* Pressure items */
   .pressure-item { padding: 22px 0; }
