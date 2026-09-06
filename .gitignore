@@ -2,3 +2,10 @@
 node_modules/
 .env
 *.log
+
+# Not for the public site (netlify.toml publishes the whole repo root) —
+# contracts, drafts, and large raw audio that shouldn't be deployed.
+Reference Documents/
+bougainvillea-tracks/
+Bougainvillea_Joshua_Tree_30min_Producer_Brief.md
+Bougainvillea_Joshua_Tree_30min_Producer_Brief.html
