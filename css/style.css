@@ -426,6 +426,24 @@ h3 { font-size: clamp(22px, 5vw, 36px); }
   border-color: var(--forest);
 }
 
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero .btn--outline {
+  background: transparent;
+  border-color: rgba(245,242,236,0.45);
+  color: var(--cream);
+}
+
+.hero .btn--outline:hover {
+  background: rgba(245,242,236,0.12);
+  border-color: rgba(245,242,236,0.75);
+}
+
 .hero {
   position: relative;
   min-height: 100svh;
@@ -1146,21 +1164,6 @@ h3 { font-size: clamp(22px, 5vw, 36px); }
   border-color: rgba(224,100,155,0.60);
   color: rgba(224,100,155,1);
 }
-
-/* ── Hero scroll link (secondary action below hero CTA) */
-.hero__scroll-link {
-  display: inline-block;
-  margin-top: 16px;
-  margin-left: 4px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(245,242,236,0.50);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.hero__scroll-link:hover { color: rgba(245,242,236,0.85); }
 
 /* ── Science section CTA ──────────────────────────── */
 .sci-cta {
